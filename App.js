@@ -8,11 +8,31 @@ const CATEGORY_OPTIONS = [
   { tag: 'Other', emoji: '🌟' }
 ];
 
+// Muscle splits for each number of days
+const MUSCLE_SPLITS = {
+  1: ["Full Body"],
+  2: ["Upper Body", "Lower Body"],
+  3: ["Push", "Pull", "Legs"],
+  4: ["Upper Body", "Lower Body", "Push", "Pull"],
+  5: ["Push", "Pull", "Legs", "Upper Body", "Lower Body"],
+  6: ["Push", "Pull", "Legs", "Push", "Pull", "Legs"],
+  7: ["Push", "Pull", "Legs", "Upper Body", "Lower Body", "Full Body", "Active Recovery"]
+};
+
+// Example exercises for each split (for demo purposes)
+const EXERCISES = {
+  "Full Body": ["Squats", "Push-ups", "Rows", "Lunges", "Plank"],
+  "Upper Body": ["Push-ups", "Rows", "Shoulder Press", "Bicep Curls", "Tricep Extensions"],
+  "Lower Body": ["Squats", "Lunges", "Deadlifts", "Calf Raises", "Glute Bridge"],
+  "Push": ["Push-ups", "Shoulder Press", "Tricep Dips", "Chest Press", "Incline Push-ups"],
+  "Pull": ["Rows", "Pull-ups", "Bicep Curls", "Face Pulls", "Reverse Fly"],
+  "Legs": ["Squats", "Lunges", "Deadlifts", "Calf Raises", "Glute Bridge"],
+  "Active Recovery": ["Stretching", "Yoga", "Foam Rolling", "Walking"]
+};
+
 // Main React component for the Workout App (Front-End Only)
 
 function App() {
-  const [goal, setGoal] = React.useState('');
-  const [showGoalScreen, setShowGoalScreen] = React.useState(true);
   const [days, setDays] = React.useState(3);
   const [equipment, setEquipment] = React.useState(['None']);
   const [schedule, setSchedule] = React.useState([]);
@@ -56,12 +76,37 @@ function App() {
     });
   }
 
-  function handleGoalSelect(selectedGoal) {
-    setGoal(selectedGoal);
-    setShowGoalScreen(false);
+  // Generate workout plan in the frontend
+  function generateWorkoutPlan(days, equipment) {
+    const splits = MUSCLE_SPLITS[days] || MUSCLE_SPLITS[3];
+    // Default parameters by split type
+    const SPLIT_PARAMS = {
+      'Push':     { sets: 4, reps: '8-12', rest: '60s' },
+      'Pull':     { sets: 4, reps: '8-12', rest: '60s' },
+      'Legs':     { sets: 4, reps: '10-15', rest: '75s' },
+      'Upper Body': { sets: 3, reps: '10-15', rest: '60s' },
+      'Lower Body': { sets: 3, reps: '12-15', rest: '75s' },
+      'Full Body':  { sets: 3, reps: '10-15', rest: '60s' },
+      'Active Recovery': { sets: 1, reps: 'Varies', rest: '-' }
+    };
+    return splits.map((split, idx) => {
+      const exs = (EXERCISES[split] || EXERCISES["Full Body"]).slice(0, 5);
+      const params = SPLIT_PARAMS[split] || { sets: 3, reps: '10-15', rest: '60s' };
+      return {
+        title: `Day ${idx + 1}: ${split}`,
+        duration: '60-75 min',
+        exercises: exs.map(name => ({
+          name,
+          sets: params.sets,
+          reps: params.reps,
+          rest: params.rest,
+          desc: ''
+        }))
+      };
+    });
   }
 
-  function handleSubmit(e) {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (equipment.length === 0) {
       alert("Please select at least one equipment option.");
@@ -70,6 +115,8 @@ function App() {
     setSchedule([]);
     setCheckedIn(Array(days).fill(false));
     setShowSchedule(true);
+    // Generate plan in frontend
+    setSchedule(generateWorkoutPlan(days, equipment));
   }
 
   function handleCheckIn(idx) {
@@ -208,20 +255,9 @@ function App() {
       {revealMilestone ? (
         <MilestoneRevealCard milestone={revealMilestone} />
       ) : activeTab === 'planner' ? (
-        showGoalScreen ? (
-          <div className="goal-screen">
-            <h1>Fitness Goals</h1>
-            <div className="goal-options">
-              <button className="goal-btn" onClick={() => handleGoalSelect('Build Muscle')}>💪 Build Muscle</button>
-              <button className="goal-btn" onClick={() => handleGoalSelect('Lose Weight')}>🔥 Lose Weight</button>
-              <button className="goal-btn" onClick={() => handleGoalSelect('General Fitness')}>🏃 General Fitness</button>
-              <button className="goal-btn" onClick={() => handleGoalSelect('Increase Endurance and Athleticism')}>⏱️ Increase Endurance and Athleticism</button>
-            </div>
-          </div>
-        ) : !showSchedule ? (
+        !showSchedule ? (
           <form className="setup-form" onSubmit={handleSubmit}>
             <h1>🏋️ Workout Split Planner</h1>
-            <div className="goal-summary">Goal: <b>{goal}</b></div>
             <label>
               Days per week:
               <input
@@ -266,7 +302,8 @@ function App() {
                       <ul>
                         {split.exercises.map((ex, i) => (
                           <li key={`${ex.name}-${i}`}>
-                            <b>{ex.name}</b> - {ex.duration}<br />
+                            <b>{ex.name}</b> <br />
+                            <span>Sets: {ex.sets} &nbsp; Reps: {ex.reps} &nbsp; Rest: {ex.rest}</span><br />
                             <span>{ex.desc}</span>
                           </li>
                         ))}
