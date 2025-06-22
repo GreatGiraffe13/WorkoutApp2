@@ -19,15 +19,96 @@ const MUSCLE_SPLITS = {
   7: ["Push", "Pull", "Legs", "Upper Body", "Lower Body", "Full Body", "Active Recovery"]
 };
 
-// Example exercises for each split (for demo purposes)
+// Expanded exercises for each split (more variety, all equipment)
 const EXERCISES = {
-  "Full Body": ["Squats", "Push-ups", "Rows", "Lunges", "Plank"],
-  "Upper Body": ["Push-ups", "Rows", "Shoulder Press", "Bicep Curls", "Tricep Extensions"],
-  "Lower Body": ["Squats", "Lunges", "Deadlifts", "Calf Raises", "Glute Bridge"],
-  "Push": ["Push-ups", "Shoulder Press", "Tricep Dips", "Chest Press", "Incline Push-ups"],
-  "Pull": ["Rows", "Pull-ups", "Bicep Curls", "Face Pulls", "Reverse Fly"],
-  "Legs": ["Squats", "Lunges", "Deadlifts", "Calf Raises", "Glute Bridge"],
-  "Active Recovery": ["Stretching", "Yoga", "Foam Rolling", "Walking"]
+  "Full Body": [
+    "Squats", "Push-ups", "Rows", "Lunges", "Plank", "Mountain Climbers", "Burpees", "Jumping Jacks", "Glute Bridge", "Step-ups", "Superman", "Bear Crawl", "Wall Sit", "Reverse Lunge", "High Knees"
+  ],
+  "Upper Body": [
+    // Limit push-up types, prioritize non-push-up moves
+    "Push-ups", "Incline Push-ups",
+    "Tricep Dips", "Plank Up-Downs", "Superman", "Pike Push-ups",
+    "Shoulder Taps", "Reverse Fly (Towel)", "Doorway Rows",
+    "Plank to Push-up", "Wall Walks", "Crab Walk", "Plank Reach",
+    "Triceps Extension (Floor)", "Isometric Chest Squeeze", "Handstand Hold"
+  ],
+  "Lower Body": [
+    "Squats", "Lunges", "Glute Bridge", "Step-ups", "Wall Sit", "Reverse Lunge", "Single Leg Glute Bridge", "Calf Raises", "Bulgarian Split Squat", "High Knees"
+  ],
+  "Push": [
+    // Limit push-up types, prioritize non-push-up moves
+    "Push-ups", "Incline Push-ups",
+    "Tricep Dips", "Pike Push-ups", "Shoulder Taps", "Plank Up-Downs",
+    "Plank to Push-up", "Wall Walks", "Triceps Extension (Floor)",
+    "Isometric Chest Squeeze", "Handstand Hold"
+  ],
+  "Pull": [
+    "Rows (Towel)", "Doorway Rows", "Superman", "Reverse Fly (Towel)", "Y-T-W Raises", "Back Widows", "Prone Arm Raises", "Chin-ups", "Pull-ups"
+  ],
+  "Legs": [
+    "Squats", "Lunges", "Glute Bridge", "Step-ups", "Wall Sit", "Reverse Lunge", "Single Leg Glute Bridge", "Calf Raises", "Bulgarian Split Squat", "High Knees"
+  ],
+  "Active Recovery": [
+    "Stretching", "Yoga", "Foam Rolling", "Walking", "Mobility Drills", "Cat Cow", "Child's Pose", "Hip Flexor Stretch"
+  ]
+};
+
+// Expanded equipment mapping (bodyweight only for new moves)
+const EXERCISE_EQUIPMENT = {
+  'Squats': ['None', 'Dumbbell', 'Barbells', 'Kettlebells', 'Complete Gym'],
+  'Push-ups': ['None'],
+  'Rows': ['None', 'Dumbbell', 'Barbells', 'Resistance Bands', 'Complete Gym'],
+  'Lunges': ['None', 'Dumbbell', 'Barbells', 'Kettlebells', 'Complete Gym'],
+  'Plank': ['None'],
+  'Mountain Climbers': ['None'],
+  'Burpees': ['None'],
+  'Jumping Jacks': ['None'],
+  'Glute Bridge': ['None', 'Dumbbell', 'Barbells', 'Complete Gym'],
+  'Step-ups': ['None', 'Dumbbell', 'Kettlebells', 'Barbells', 'Complete Gym'],
+  'Superman': ['None'],
+  'Bear Crawl': ['None'],
+  'Wall Sit': ['None'],
+  'Reverse Lunge': ['None'],
+  'High Knees': ['None'],
+  'Incline Push-ups': ['None'],
+  'Diamond Push-ups': ['None'],
+  'Tricep Dips': ['None'],
+  'Plank Up-Downs': ['None'],
+  'Pike Push-ups': ['None'],
+  'Shoulder Taps': ['None'],
+  'Reverse Fly (Towel)': ['None'],
+  'Doorway Rows': ['None'],
+  'Single Leg Glute Bridge': ['None'],
+  'Bulgarian Split Squat': ['None', 'Dumbbell', 'Kettlebells', 'Barbells', 'Complete Gym'],
+  'Decline Push-ups': ['None'],
+  'Archer Push-ups': ['None'],
+  'Rows (Towel)': ['None'],
+  'Y-T-W Raises': ['None'],
+  'Back Widows': ['None'],
+  'Prone Arm Raises': ['None'],
+  'Chin-ups': ['None', 'Complete Gym'],
+  'Pull-ups': ['None', 'Complete Gym'],
+  'Calf Raises': ['None', 'Dumbbell', 'Barbells', 'Kettlebells', 'Complete Gym'],
+  'Stretching': ['None'],
+  'Yoga': ['None'],
+  'Foam Rolling': ['None'],
+  'Walking': ['None'],
+  'Mobility Drills': ['None'],
+  "Cat Cow": ['None'],
+  "Child's Pose": ['None'],
+  "Hip Flexor Stretch": ['None'],
+  'Plank to Push-up': ['None'],
+  'Hindu Push-up': ['None'],
+  'Dive Bomber Push-up': ['None'],
+  'Wall Walks': ['None'],
+  'Crab Walk': ['None'],
+  'Plank Reach': ['None'],
+  'Triceps Extension (Floor)': ['None'],
+  'Isometric Chest Squeeze': ['None'],
+  'Wide Push-up': ['None'],
+  'Plyometric Push-up': ['None'],
+  'Handstand Hold': ['None'],
+  'Pseudo Planche Push-up': ['None'],
 };
 
 // Main React component for the Workout App (Front-End Only)
@@ -79,7 +160,6 @@ function App() {
   // Generate workout plan in the frontend
   function generateWorkoutPlan(days, equipment) {
     const splits = MUSCLE_SPLITS[days] || MUSCLE_SPLITS[3];
-    // Default parameters by split type
     const SPLIT_PARAMS = {
       'Push':     { sets: 4, reps: '8-12', rest: '60s' },
       'Pull':     { sets: 4, reps: '8-12', rest: '60s' },
@@ -89,13 +169,70 @@ function App() {
       'Full Body':  { sets: 3, reps: '10-15', rest: '60s' },
       'Active Recovery': { sets: 1, reps: 'Varies', rest: '-' }
     };
+    function canDoExercise(exName) {
+      const required = EXERCISE_EQUIPMENT[exName] || ['None'];
+      if (equipment.length === 1 && equipment[0] === 'None') return required.includes('None');
+      if (equipment.includes('Complete Gym')) return true;
+      if (required.includes('None') && equipment.includes('None')) return true;
+      return required.some(eq => equipment.includes(eq));
+    }
+    // Helper: is a push-up or push-up variation
+    function isPushUp(exName) {
+      return /push[- ]?up/i.test(exName);
+    }
     return splits.map((split, idx) => {
-      const exs = (EXERCISES[split] || EXERCISES["Full Body"]).slice(0, 5);
+      let exs = EXERCISES[split] || [];
+      let filtered = exs.filter(canDoExercise);
+      // Special handling for bodyweight Push/Upper Body days
+      if (
+        (split === 'Push' || split === 'Upper Body') &&
+        equipment.length === 1 && equipment[0] === 'None'
+      ) {
+        // Separate push-ups and non-push-ups
+        const pushUps = filtered.filter(isPushUp);
+        const nonPushUps = filtered.filter(ex => !isPushUp(ex));
+        // Limit to max 2 push-up types per day
+        const selectedPushUps = pushUps.slice(0, 2);
+        // Guarantee at least 2 non-push-up exercises (if available)
+        let selectedNonPushUps = nonPushUps.slice(0, 3);
+        // If not enough non-push-ups, fill with more push-ups (but never more than 2)
+        let dayExercises = [...selectedNonPushUps, ...selectedPushUps];
+        // If still less than 4, fill with any remaining non-push-ups, then push-ups
+        if (dayExercises.length < 4) {
+          const moreNonPush = nonPushUps.slice(selectedNonPushUps.length, 4 - selectedPushUps.length);
+          dayExercises = [...dayExercises, ...moreNonPush];
+        }
+        if (dayExercises.length < 4) {
+          const morePush = pushUps.slice(selectedPushUps.length, 4);
+          dayExercises = [...dayExercises, ...morePush];
+        }
+        // If still not enough, repeat non-push-ups
+        while (dayExercises.length < 4 && nonPushUps.length > 0) {
+          dayExercises.push(nonPushUps[dayExercises.length % nonPushUps.length]);
+        }
+        // Final fallback: repeat any
+        while (dayExercises.length < 4 && filtered.length > 0) {
+          dayExercises.push(filtered[dayExercises.length % filtered.length]);
+        }
+        filtered = dayExercises.slice(0, 5);
+      } else {
+        // Default logic for other splits
+        // If not enough, fill with bodyweight/no-equipment moves from this split only
+        if (filtered.length < 4) {
+          const bodyweight = exs.filter(ex => (EXERCISE_EQUIPMENT[ex]||[]).includes('None'));
+          filtered = [...filtered, ...bodyweight.filter(ex => !filtered.includes(ex))];
+        }
+        // If still not enough, repeat available exercises to reach 4
+        while (filtered.length < 4 && filtered.length > 0) {
+          filtered.push(filtered[filtered.length % filtered.length]);
+        }
+        filtered = filtered.slice(0, Math.max(4, filtered.length));
+      }
       const params = SPLIT_PARAMS[split] || { sets: 3, reps: '10-15', rest: '60s' };
       return {
         title: `Day ${idx + 1}: ${split}`,
         duration: '60-75 min',
-        exercises: exs.map(name => ({
+        exercises: filtered.slice(0, 5).map(name => ({
           name,
           sets: params.sets,
           reps: params.reps,
@@ -454,9 +591,6 @@ function App() {
         <Dashboard achievements={achievements} moodData={dashboardMood} />
       )}
 
-      <footer>
-        <small>Front-end only: All split/exercise data will come from your Python backend. Edit this file to adjust UI only.</small>
-      </footer>
     </div>
   );
 }
