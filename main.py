@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import List, Literal, Annotated
 import random
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 # Define possible options
 EQUIPMENT_OPTIONS = [
@@ -986,3 +988,20 @@ def get_goal_options():
 # Returns: workout plan (list of dicts)
 def get_workout_plan(days_per_week, equipment, goal):
     return generate_workout(days_per_week, equipment, goal)
+
+app = Flask(__name__)
+CORS(app)  # Allow cross-origin requests from frontend
+
+@app.route('/api/generate_workout', methods=['POST'])
+def api_generate_workout():
+    data = request.get_json()
+    days_per_week = data.get('days_per_week')
+    equipment = data.get('equipment')
+    goal = data.get('goal')
+    if not (days_per_week and equipment and goal):
+        return jsonify({'error': 'Missing required fields'}), 400
+    plan = get_workout_plan(days_per_week, equipment, goal)
+    return jsonify({'workout_plan': plan})
+
+if __name__ == '__main__':
+    app.run(debug=True)
